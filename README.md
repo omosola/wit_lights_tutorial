@@ -10,7 +10,7 @@ You should also have npm and Node.js installed as well as your Hue Bridge and Li
 
 #### Other Useful Info
 * https://wit.ai
-* https://wit.ai/docs/quickstart
+* https://wit.ai/docs
 * [Web SDK](https://github.com/wit-ai/wit-widgets/releases/tag/0.4.0)
 * [Philips Hue Docs](http://www.developers.meethue.com/documentation/getting-started)
 * help@wit.ai
@@ -33,8 +33,8 @@ Install Express and other dependencies and create the Express app.
 npm install express
 npm install -g express-generator
 cd path/to/project
-express --ejs node_lights_tutorial
-cd node_lights_tutorial
+express --ejs wit_lights_tutorial
+cd wit_lights_tutorial
 npm install request --save
 npm install
 ```
@@ -141,7 +141,7 @@ In `public/javascripts/scripts.js` add the following code to grab and format the
 mic.onresult = function (intent, entities) {
   var result = 'WAT?!';
   if (intent == 'lights') {
-    var value = entities.on_off.value;
+    var value = entities.on_off && entities.on_off.value;
     if (value == 'on' || value == 'off') {
       result = 'Turing the lights ' + value;
       sendRequest(
@@ -173,7 +173,7 @@ var router = express.Router();
 var request = require('request');
 
 var lights = [{ id: 1 }, { id: 2}];
-var hue_url = 'http://192.168.1.110/api/newdeveloper/lights/';
+var hue_url = 'http://<HUE_BRIDGE_IP_ADDRESS>/api/newdeveloper/lights/';
 
 router.put('/lights', function(req, res) {
     var command = JSON.parse(req.body.data);
@@ -214,7 +214,7 @@ var colors = {
 mic.onresult = function (intent, entities) {
   var result = 'WAT?!';
   if (intent == 'lights') {
-    var value = entities.on_off.value;
+    var value = entities.on_off && entities.on_off.value;
     if (value == 'on' || value == 'off') {
       result = 'Turing the lights ' + value;
       sendRequest(
@@ -223,8 +223,8 @@ mic.onresult = function (intent, entities) {
       );
     } 
   } else if (intent == 'change_color') {
-    var value = entities.color.value;
-    var color = colors[entities.color.value];
+    var value = entities.color && entities.color.value;
+    var color = colors[value];
     if (color) {
       sendRequest(
         'api/change_color', 

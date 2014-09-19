@@ -32,7 +32,7 @@ $(document).ready(function () {
     mic.onresult = function (intent, entities) {
       var result = 'WAT?!';
       if (intent == 'lights') {
-        var value = entities.on_off.value;
+        var value = entities.on_off && entities.on_off.value;
         if (value == 'on' || value == 'off') {
           result = 'Turing the lights ' + value;
           sendRequest(
@@ -41,8 +41,8 @@ $(document).ready(function () {
           );
         } 
       } else if (intent == 'change_color') {
-        var value = entities.color.value;
-        var color = colors[entities.color.value];
+        var value = entities.color && entities.color.value;
+        var color = colors[value];
         if (color) {
           sendRequest(
             'api/change_color', 
