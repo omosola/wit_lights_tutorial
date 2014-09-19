@@ -1,4 +1,4 @@
-## Node Lights Tutorial
+## Wit.ai Lights Tutorial
 
 Create a voice controlled command center for Hue Smart Lights powered by Wit.ai.
 
@@ -172,11 +172,14 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 
-var hue_url = 'http://<INSERT HUE IP ADDRESS>/api/newdeveloper/lights/2/state';
+var lights = [{ id: 1 }, { id: 2}];
+var hue_url = 'http://192.168.1.110/api/newdeveloper/lights/';
 
 router.put('/lights', function(req, res) {
     var command = JSON.parse(req.body.data);
-    request.put(hue_url, { json: command.entity });
+    for (var i = 0; i < lights.length; i++) {
+        request.put(hue_url + lights[i].id + '/state', { json: command.entity });
+    }
 });
 
 module.exports = router;
@@ -242,7 +245,9 @@ Add the `/change_color` route to `routes/api.js`.
 ```javascript
 router.put('/change_color', function(req, res) {
     var command = JSON.parse(req.body.data);
-    request.put(hue_url, { json: command.entity });
+    for (var i = 0; i < lights.length; i++) {
+        request.put(hue_url + lights[i].id + '/state', { json: command.entity });
+    }
 });
 ```
 Restart the server and party!

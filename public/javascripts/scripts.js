@@ -56,7 +56,7 @@ $(document).ready(function () {
       document.getElementById("result").innerHTML = result;
     };
 
-    mic.connect("<INSERT_WIT_CLIENT_KEY_HERE>");
+    mic.connect("Q2GO7ZL6AZHUJ3ZIR2LGTVOJGSOQHS5L");
     // mic.start();
     // mic.stop();
     
