@@ -56,7 +56,7 @@ $(document).ready(function () {
       document.getElementById("result").innerHTML = result;
     };
 
-    mic.connect("Q2GO7ZL6AZHUJ3ZIR2LGTVOJGSOQHS5L");
+    mic.connect("<INSERT_CLIENT_TOKEN>");
     // mic.start();
     // mic.stop();
     
