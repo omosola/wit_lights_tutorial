@@ -34,7 +34,7 @@ $(document).ready(function () {
 	    }
 	};
 
-	mic.connect("INSERT WIT CLIENT KEY HERE");
+	mic.connect("EPTSOEDCDJ4VIJDIFNDUBJRZZNIWUJQU");
 
 	function concatKeyValue (k, v) {
 	    if (typeof v !== "string") {
