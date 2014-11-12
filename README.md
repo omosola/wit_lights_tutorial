@@ -30,11 +30,11 @@ Under settings, use the cURL generator to create a cURL to connect with the Wit 
 Install Express and other dependencies and create the Express app.
 
 ```bash
-npm install express
+npm install -g express
 npm install -g express-generator
 cd path/to/project
-express --ejs wit_lights_tutorial
-cd wit_lights_tutorial
+express --ejs witty_lights
+cd witty_lights
 npm install request --save
 npm install
 ```
@@ -56,7 +56,7 @@ Change name of the `users.js` file to `api.js`.
 
 ## Add the Wit Microphone to Your App
 
-Download the [SDK](https://github.com/wit-ai/wit-widgets/releases/tag/0.4.0) and unzip it. Move the `microphone.js` to `public/javascripts` and `microphone.css` and the `fonts` directory to `public/stylesheets`.
+Download the [SDK](https://github.com/wit-ai/microphone/releases/download/0.7.0/microphone-0.7.0.tar.gz) to `public/javascripts` and unzip it. 
 
 In `views/index.ejs` add the following: 
 
@@ -64,14 +64,15 @@ In `views/index.ejs` add the following:
 <!DOCTYPE html>
 <html>
   <head>
+    <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel='stylesheet' href='/stylesheets/microphone.css' />
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src='/javascripts/microphone.js'></script>
+    <link rel='stylesheet' href='/javascripts/microphone-0.7.0/microphone.min.css' />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src='/javascripts/microphone-0.7.0/microphone.min.js'></script>
     <script type="text/javascript" src='/javascripts/scripts.js'></script>
   </head>
   <body>
-    <h1>Hue Command and Control</h1>
+    <h1><%= title %></h1>    
     <div id='microphone'></div>
     <pre id='result'></pre>
     <div id='info'></div>
@@ -99,28 +100,28 @@ $(document).ready(function () {
     info("Error: " + err);
   };
   mic.onresult = function (intent, entities) {
-    var r = kv("intent", intent);
+    console.log(intent, entities);
+    var result = concatKeyValue("intent", intent);
 
     for (var k in entities) {
       var e = entities[k];
 
       if (!(e instanceof Array)) {
-        r += kv(k, e.value);
+        result += concatKeyValue(k, e.value);
       } else {
         for (var i = 0; i < e.length; i++) {
-          r += kv(k, e[i].value);
+          result += concatKeyValue(k, e[i].value);
         }
       }
+
+      document.getElementById("result").innerHTML = result;
     }
-
-    document.getElementById("result").innerHTML = r;
   };
-  mic.connect("INSERT YOUR CLIENT TOKEN");
-  // mic.start();
-  // mic.stop();
 
-  function kv (k, v) {
-    if (toString.call(v) !== "[object String]") {
+  mic.connect("INSERT WIT CLIENT KEY HERE");
+
+  function concatKeyValue (k, v) {
+    if (typeof v !== "string") {
       v = JSON.stringify(v);
     }
     return k + "=" + v + "\n";
@@ -139,16 +140,18 @@ In `public/javascripts/scripts.js` add the following code to grab and format the
 ...
 
 mic.onresult = function (intent, entities) {
-  var result = 'WAT?!';
-  if (intent == 'lights') {
+  var result;
+  if (intent === 'lights') {
     var value = entities.on_off && entities.on_off.value;
-    if (value == 'on' || value == 'off') {
-      result = 'Turing the lights ' + value;
+    if (value === 'on' || value === 'off') {
+      result = 'Turning the light ' + value;
       sendRequest(
         'api/lights',
-        { data: JSON.stringify({ intent: intent, entity: { 'on': (value == 'on') }})} 
+        { data: JSON.stringify({ intent: intent, entity: { 'on': (value === 'on') }})} 
       );
-    } 
+    }
+  } else  {
+      result = 'WAT?!'
   }
   document.getElementById("result").innerHTML = result;
 };
@@ -176,10 +179,10 @@ var lights = [{ id: 1 }, { id: 2}];
 var hue_url = 'http://<HUE_BRIDGE_IP_ADDRESS>/api/newdeveloper/lights/';
 
 router.put('/lights', function(req, res) {
-    var command = JSON.parse(req.body.data);
-    for (var i = 0; i < lights.length; i++) {
-        request.put(hue_url + lights[i].id + '/state', { json: command.entity });
-    }
+  var command = JSON.parse(req.body.data);
+  for (var i = 0; i < lights.length; i++) {
+    request.put(hue_url + lights[i].id + '/state', { json: command.entity });
+  }
 });
 
 module.exports = router;
@@ -197,32 +200,32 @@ In `public/javascripts/scripts.js` add the following code which creates a dictio
 
 ```javascript
 var colors = {
-        blue:     { hue: 43680, saturation: 255,  brightness: 127},
-        cyan:     { hue: 35000, saturation: 255,  brightness: 127 },
-        fuchsia:  { hue: 54612, saturation: 255,  brightness: 127 },
-        green:    { hue: 26000, saturation: 255,  brightness: 63 },
-        lavender: { hue: 50050, saturation: 145,  brightness: 173 },
-        orange:   { hue: 6100,  saturation: 255,  brightness: 150 },
-        red:      { hue: 0,     saturation: 255,  brightness: 127 },
-        violet:   { hue: 50400, saturation: 255,  brightness: 127 },
-        white:    { hue: 0,     saturation: 0,    brightness: 255 },
-        yellow:   { hue: 14563, saturation: 255,  brightness: 150 }
-    };
+  blue:     { hue: 43680, saturation: 255,  brightness: 127},
+  cyan:     { hue: 35000, saturation: 255,  brightness: 127 },
+  fuchsia:  { hue: 54612, saturation: 255,  brightness: 127 },
+  green:    { hue: 26000, saturation: 255,  brightness: 63 },
+  lavender: { hue: 50050, saturation: 145,  brightness: 173 },
+  orange:   { hue: 6100,  saturation: 255,  brightness: 150 },
+  red:      { hue: 0,     saturation: 255,  brightness: 127 },
+  violet:   { hue: 50400, saturation: 255,  brightness: 127 },
+  white:    { hue: 0,     saturation: 0,    brightness: 255 },
+  yellow:   { hue: 14563, saturation: 255,  brightness: 150 }
+};
 
 ...
 
 mic.onresult = function (intent, entities) {
-  var result = 'WAT?!';
-  if (intent == 'lights') {
-    var value = entities.on_off && entities.on_off.value;
+  var result;
+  if (intent === 'lights') {
+    var value = entities.on_off.value;
     if (value == 'on' || value == 'off') {
-      result = 'Turing the lights ' + value;
+      result = 'Turning the light ' + value;
       sendRequest(
         'api/lights',
         { data: JSON.stringify({ intent: intent, entity: { 'on': (value == 'on') }})} 
       );
-    } 
-  } else if (intent == 'change_color') {
+    }
+  } else if (intent === 'change_color') {
     var value = entities.color && entities.color.value;
     var color = colors[value];
     if (color) {
@@ -234,6 +237,8 @@ mic.onresult = function (intent, entities) {
     } else {
       result = 'I don\'t know the color ' + value;
     }
+  } else {
+      result = 'WAT?!';
   }
   document.getElementById("result").innerHTML = result;
 };
@@ -244,10 +249,11 @@ Add the `/change_color` route to `routes/api.js`.
 
 ```javascript
 router.put('/change_color', function(req, res) {
-    var command = JSON.parse(req.body.data);
-    for (var i = 0; i < lights.length; i++) {
-        request.put(hue_url + lights[i].id + '/state', { json: command.entity });
-    }
+  var command = JSON.parse(req.body.data);
+  for (var i = 0; i < lights.length; i++) {
+    request.put(hue_url + lights[i].id + '/state', { json: command.entity });
+  }
+  res.send(200);
 });
 ```
 Restart the server and party!
