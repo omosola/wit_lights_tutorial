@@ -16,7 +16,7 @@ $(document).ready(function () {
 	    info("Error: " + err);
 	};
 	mic.onresult = function (intent, entities) {
-	    console.log(intent, entities);
+	    /*	    console.log(intent, entities);
 	    var result = concatKeyValue("intent", intent);
 
 	    for (var k in entities) {
@@ -31,8 +31,33 @@ $(document).ready(function () {
 		}
 
 		document.getElementById("result").innerHTML = result;
+		}*/
+	    var result;
+	    if (intent == 'lights') {
+		var value = entities.on_off && entities.on_off.value;
+		if (value === 'on' || value === 'off') {
+		    result = 'Turning the light ' + value;
+		    sendRequest('api/lights', {
+			    data: JSON.stringify({intent: intent, entity: {
+					'on': (value == 'on')
+				    }})
+			});
+		} else {
+		    result = 'WAT?!';
+		}
+		document.getElementById("result").innerHTML = result;
 	    }
 	};
+	
+	function sendRequest(url, data) {
+	    $.ajax({
+		    url: url,
+			type: 'PUT',
+			data: data,
+			dataType: 'json'
+		});
+	}
+
 
 	mic.connect("EPTSOEDCDJ4VIJDIFNDUBJRZZNIWUJQU");
 
